@@ -2,7 +2,8 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Mail, MapPin, Pencil, Phone, Plus, Trash2, User } from "lucide-react";
 import { api, type ActivityType } from "../api";
-import { activityTypeLabel, formatDate, formatDateTime, formatMoney, localInputToIso, useData } from "../utils";
+import { activityTypeLabel, formatDate, formatDateTime, formatMoney, useData } from "../utils";
+import DateField from "../components/DateField";
 import { Empty, ErrorNote, Modal, PageHeader } from "../components/ui";
 import { CustomerStatusBadge, QuoteStatusBadge } from "../components/StatusBadges";
 import CustomerForm from "../components/CustomerForm";
@@ -146,14 +147,14 @@ export default function CustomerDetailPage() {
 function ActivityForm({ customerId, onDone }: { customerId: number; onDone: () => void }) {
   const [type, setType] = useState<ActivityType>("Call");
   const [subject, setSubject] = useState("");
-  const [dueDate, setDueDate] = useState("");
+  const [dueDate, setDueDate] = useState<Date | null>(null);
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     try {
-      await api.createActivity({ customerId, type, subject, notes: notes || undefined, dueDate: localInputToIso(dueDate) });
+      await api.createActivity({ customerId, type, subject, notes: notes || undefined, dueDate: dueDate?.toISOString() });
       onDone();
     } catch (err) {
       setError((err as Error).message);
@@ -174,7 +175,7 @@ function ActivityForm({ customerId, onDone }: { customerId: number; onDone: () =
         </label>
         <label>
           Tarih ve saat
-          <input type="datetime-local" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+          <DateField withTime value={dueDate} onChange={setDueDate} />
         </label>
       </div>
       <label>
@@ -182,8 +183,8 @@ function ActivityForm({ customerId, onDone }: { customerId: number; onDone: () =
         <input required value={subject} onChange={(e) => setSubject(e.target.value)} autoFocus />
       </label>
       <label>
-        Not
-        <textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        Açıklama
+        <textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Görüşmenin özeti, sonraki adım vb." />
       </label>
       <div className="form-actions">
         <button type="submit" className="btn primary">Kaydet</button>

@@ -29,7 +29,6 @@ export default function App() {
     <div className="layout">
       <aside className="sidebar no-print">
         <div className="brand">
-          <div className="brand-mark">d</div>
           <span>
             digitest<b>CRM</b>
           </span>

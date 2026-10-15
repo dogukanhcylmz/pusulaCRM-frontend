@@ -72,7 +72,7 @@ export default function CustomersPage() {
                   <td className="strong">{c.companyName}</td>
                   <td>
                     {c.contactName ?? "—"}
-                    {c.email && <div className="muted small">{c.email}</div>}
+                    {c.email && <div className="muted small hide-sm">{c.email}</div>}
                   </td>
                   <td className="hide-sm">{c.city ?? "—"}</td>
                   <td><CustomerStatusBadge status={c.status} /></td>

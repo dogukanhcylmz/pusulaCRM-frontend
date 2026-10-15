@@ -62,6 +62,3 @@ export function useData<T>(loader: () => Promise<T>, deps: unknown[] = []) {
 
   return { data, error, reload };
 }
-
-/** <input type="datetime-local"> değerini UTC ISO metnine çevirir. */
-export const localInputToIso = (v: string) => (v ? new Date(v).toISOString() : undefined);

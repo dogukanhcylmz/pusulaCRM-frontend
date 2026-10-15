@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { api, type QuoteItem } from "../api";
 import { formatMoney, useData } from "../utils";
 import { ErrorNote, PageHeader } from "../components/ui";
+import DateField from "../components/DateField";
 import { useChatPage } from "../chatContext";
 
 const emptyItem = (): QuoteItem => ({ description: "", quantity: 1, unitPrice: 0, discountPercent: 0 });
@@ -18,10 +19,11 @@ export default function QuoteFormPage() {
   const [customerId, setCustomerId] = useState(params.get("customerId") ?? "");
   const [title, setTitle] = useState("");
   const [taxRate, setTaxRate] = useState(20);
-  const [validUntil, setValidUntil] = useState(() => {
+  const [validUntil, setValidUntil] = useState<Date | null>(() => {
     const d = new Date();
+    d.setHours(0, 0, 0, 0);
     d.setDate(d.getDate() + 30);
-    return d.toISOString().slice(0, 10);
+    return d;
   });
   const [items, setItems] = useState<QuoteItem[]>([emptyItem()]);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +44,10 @@ export default function QuoteFormPage() {
         customerId: Number(customerId),
         title,
         taxRate,
-        validUntil: new Date(validUntil).toISOString(),
+        // Seçilen günün UTC gece yarısı (önceki <input type="date"> ile aynı); boşsa sunucu varsayılanı kullanır
+        validUntil: validUntil
+          ? new Date(Date.UTC(validUntil.getFullYear(), validUntil.getMonth(), validUntil.getDate())).toISOString()
+          : undefined,
         items: items.filter((i) => i.description.trim()),
       });
       navigate(`/quotes/${created.id}`);
@@ -87,10 +92,23 @@ export default function QuoteFormPage() {
           {items.map((it, i) => (
             <div className="items-row" key={i}>
               <input placeholder="Açıklama" value={it.description} onChange={(e) => updateItem(i, { description: e.target.value })} />
-              <input type="number" min={0.01} step="any" value={it.quantity} onChange={(e) => updateItem(i, { quantity: Number(e.target.value) })} />
-              <input type="number" min={0} step="any" value={it.unitPrice} onChange={(e) => updateItem(i, { unitPrice: Number(e.target.value) })} />
-              <input type="number" min={0} max={100} step="any" value={it.discountPercent} onChange={(e) => updateItem(i, { discountPercent: Number(e.target.value) })} />
-              <span className="num strong">{formatMoney(lineTotal(it))}</span>
+              {/* Etiketler yalnız mobilde görünür; masaüstünde sütun başlıkları var */}
+              <label className="item-field">
+                <span className="item-label">Miktar</span>
+                <input type="number" inputMode="decimal" min={0.01} step="any" value={it.quantity} onChange={(e) => updateItem(i, { quantity: Number(e.target.value) })} />
+              </label>
+              <label className="item-field">
+                <span className="item-label">Birim fiyat</span>
+                <input type="number" inputMode="decimal" min={0} step="any" value={it.unitPrice} onChange={(e) => updateItem(i, { unitPrice: Number(e.target.value) })} />
+              </label>
+              <label className="item-field">
+                <span className="item-label">İskonto %</span>
+                <input type="number" inputMode="decimal" min={0} max={100} step="any" value={it.discountPercent} onChange={(e) => updateItem(i, { discountPercent: Number(e.target.value) })} />
+              </label>
+              <div className="item-field item-total">
+                <span className="item-label">Tutar</span>
+                <span className="num strong">{formatMoney(lineTotal(it))}</span>
+              </div>
               <button type="button" className="icon-btn" disabled={items.length === 1} onClick={() => setItems(items.filter((_, j) => j !== i))} aria-label="Kalemi sil">
                 <Trash2 size={16} />
               </button>
@@ -109,7 +127,7 @@ export default function QuoteFormPage() {
             </label>
             <label>
               Geçerlilik tarihi
-              <input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} />
+              <DateField value={validUntil} onChange={setValidUntil} minDate={new Date()} />
             </label>
           </div>
           <div className="totals">

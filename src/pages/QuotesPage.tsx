@@ -43,7 +43,7 @@ export default function QuotesPage() {
           <table className="table">
             <thead>
               <tr>
-                <th>No</th>
+                <th className="hide-sm">No</th>
                 <th>Başlık</th>
                 <th className="hide-sm">Müşteri</th>
                 <th>Durum</th>
@@ -54,8 +54,11 @@ export default function QuotesPage() {
             <tbody>
               {data?.map((q) => (
                 <tr key={q.id} className="clickable" onClick={() => navigate(`/quotes/${q.id}`)}>
-                  <td className="mono">{q.quoteNumber}</td>
-                  <td className="strong">{q.title}</td>
+                  <td className="mono hide-sm">{q.quoteNumber}</td>
+                  <td className="strong">
+                    {q.title}
+                    <div className="mono muted show-sm">{q.quoteNumber}</div>
+                  </td>
                   <td className="hide-sm">{q.customerName}</td>
                   <td><QuoteStatusBadge status={q.status} /></td>
                   <td className="hide-sm muted">{formatDate(q.validUntil)}</td>
