@@ -16,6 +16,21 @@ export interface Customer {
   openActivityCount: number;
   quoteCount: number;
 }
+/** Sayfalı liste cevabı (backend `PagedResult<T>`). */
+export interface PagedResult<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+export interface CustomerPageQuery {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: CustomerStatus;
+}
+
 export type CustomerInput = Omit<Customer, "id" | "createdAt" | "openActivityCount" | "quoteCount">;
 
 export interface Activity {
@@ -147,6 +162,8 @@ export const api = {
 
   customers: (search?: string, status?: CustomerStatus) =>
     request<Customer[]>(`/api/customers${qs({ search, status })}`),
+  customersPaged: (query: CustomerPageQuery) =>
+    request<PagedResult<Customer>>(`/api/customers/paged${qs({ ...query })}`),
   customer: (id: number) => request<Customer>(`/api/customers/${id}`),
   createCustomer: (data: CustomerInput) =>
     request<Customer>("/api/customers", { method: "POST", body: JSON.stringify(data) }),

@@ -195,6 +195,13 @@ select { width: auto; cursor: pointer; }
 .table tr.clickable { cursor: pointer; }
 .table tr.clickable:hover td { background: var(--row-hover); }
 
+/* ---------- Sayfalama ---------- */
+.card.is-loading { opacity: .55; transition: opacity .15s; }
+.list-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; margin-top: 14px; }
+.pagination { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.pagination .page-num { min-width: 34px; justify-content: center; }
+.pagination .page-num.active { background: var(--primary-soft); border-color: var(--primary-border); color: var(--primary); }
+
 /* ---------- Liste ---------- */
 .list { list-style: none; margin: 0; padding: 0; }
 .list li { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }

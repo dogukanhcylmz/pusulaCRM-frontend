@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { ActivityType, CustomerStatus, QuoteStatus } from "./api";
 
 // ---------- Biçimlendirme ----------
@@ -41,17 +41,25 @@ export const notifyDataChanged = () => window.dispatchEvent(new Event(EVENT));
 export function useData<T>(loader: () => Promise<T>, deps: unknown[] = []) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  // Yalnızca en son isteğin cevabı işlenir; geç gelen eski cevap yenisini ezmez
+  const lastRequest = useRef(0);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const load = useCallback(loader, deps);
 
   const reload = useCallback(() => {
+    const requestId = ++lastRequest.current;
+    const isLatest = () => requestId === lastRequest.current;
+    setLoading(true);
     load()
       .then((d) => {
+        if (!isLatest()) return;
         setData(d);
         setError(null);
       })
-      .catch((e: Error) => setError(e.message));
+      .catch((e: Error) => isLatest() && setError(e.message))
+      .finally(() => isLatest() && setLoading(false));
   }, [load]);
 
   useEffect(() => {
@@ -60,5 +68,5 @@ export function useData<T>(loader: () => Promise<T>, deps: unknown[] = []) {
     return () => window.removeEventListener(EVENT, reload);
   }, [reload]);
 
-  return { data, error, reload };
+  return { data, error, loading, reload };
 }

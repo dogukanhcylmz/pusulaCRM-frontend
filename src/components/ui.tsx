@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from "react";
-import { X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
   useEffect(() => {
@@ -46,4 +46,37 @@ export function Empty({ children }: { children: ReactNode }) {
 
 export function ErrorNote({ message }: { message: string | null }) {
   return message ? <div className="error-note">{message}</div> : null;
+}
+
+export function Pagination({
+  page,
+  totalPages,
+  disabled,
+  onChange,
+}: {
+  page: number;
+  totalPages: number;
+  disabled?: boolean;
+  onChange: (page: number) => void;
+}) {
+  return (
+    <nav className="pagination" aria-label="Sayfalama">
+      <button className="btn small" disabled={disabled || page <= 1} onClick={() => onChange(page - 1)}>
+        <ChevronLeft size={15} /> Önceki
+      </button>
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+        <button
+          key={p}
+          className={`btn small page-num${p === page ? " active" : ""}`}
+          disabled={disabled}
+          onClick={() => onChange(p)}
+        >
+          {p}
+        </button>
+      ))}
+      <button className="btn small" disabled={disabled || page >= totalPages} onClick={() => onChange(page + 1)}>
+        Sonraki <ChevronRight size={15} />
+      </button>
+    </nav>
+  );
 }
