@@ -203,7 +203,9 @@ select { width: auto; cursor: pointer; }
 .list li.done .strong { text-decoration: line-through; color: var(--muted); }
 .check { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; }
 .check input { width: 17px; height: 17px; margin-top: 2px; accent-color: var(--primary); flex-shrink: 0; }
-.note { margin-top: 6px; background: var(--surface-alt); padding: 6px 9px; border-radius: 7px; color: var(--muted); }
+.note { margin-top: 6px; background: var(--surface-alt); padding: 6px 9px; border-radius: 7px; color: var(--muted); white-space: pre-wrap; }
+.notes { margin-top: 20px; }
+.notes .note { margin-bottom: 6px; }
 
 /* ---------- Rozet ---------- */
 .badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }

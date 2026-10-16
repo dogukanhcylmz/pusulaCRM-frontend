@@ -36,6 +36,7 @@ export interface ActivityInput {
   notes?: string;
   dueDate?: string;
 }
+export type ActivityUpdateInput = Omit<ActivityInput, "customerId">;
 
 export interface QuoteItem {
   id?: number;
@@ -156,6 +157,8 @@ export const api = {
   activities: (customerId?: number) => request<Activity[]>(`/api/activities${qs({ customerId })}`),
   createActivity: (data: ActivityInput) =>
     request<Activity>("/api/activities", { method: "POST", body: JSON.stringify(data) }),
+  updateActivity: (id: number, data: ActivityUpdateInput) =>
+    request<Activity>(`/api/activities/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   completeActivity: (id: number, value: boolean) =>
     request<Activity>(`/api/activities/${id}/complete${qs({ value })}`, { method: "PATCH" }),
   deleteActivity: (id: number) => request<void>(`/api/activities/${id}`, { method: "DELETE" }),
