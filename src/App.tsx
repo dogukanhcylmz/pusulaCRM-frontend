@@ -61,6 +61,7 @@ export default function App() {
           <Route path="/quotes" element={<QuotesPage />} />
           <Route path="/quotes/new" element={<QuoteFormPage />} />
           <Route path="/quotes/:id" element={<QuoteDetailPage />} />
+          <Route path="/quotes/:id/edit" element={<QuoteFormPage />} />
         </Routes>
       </main>
 

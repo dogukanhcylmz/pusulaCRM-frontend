@@ -1,31 +1,69 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
-import { api, type QuoteItem } from "../api";
+import { api, type Quote, type QuoteItem } from "../api";
 import { formatMoney, useData } from "../utils";
-import { ErrorNote, PageHeader } from "../components/ui";
+import { Empty, ErrorNote, PageHeader } from "../components/ui";
 import DateField from "../components/DateField";
 import { useChatPage } from "../chatContext";
 
 const emptyItem = (): QuoteItem => ({ description: "", quantity: 1, unitPrice: 0, discountPercent: 0 });
 const lineTotal = (i: QuoteItem) => i.quantity * i.unitPrice * (1 - i.discountPercent / 100);
 
+// Sunucudaki UTC gün, yerel saatte aynı günün gece yarısı olarak
+const utcDayToLocal = (iso: string) => {
+  const d = new Date(iso);
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+};
+
 export default function QuoteFormPage() {
-  useChatPage("quote-new");
+  const id = Number(useParams().id) || undefined;
+  useChatPage(id ? "quote-detail" : "quote-new", { quoteId: id });
+  return id ? <EditQuote id={id} /> : <QuoteForm />;
+}
+
+function EditQuote({ id }: { id: number }) {
+  const { data: quote, error } = useData(() => api.quote(id), [id]);
+  const settled = quote && (quote.status === "Accepted" || quote.status === "Rejected");
+
+  if (quote && !settled) return <QuoteForm quote={quote} />;
+
+  return (
+    <>
+      <Link to={`/quotes/${id}`} className="back-link"><ArrowLeft size={16} /> {quote?.quoteNumber ?? "Teklif"}</Link>
+      <ErrorNote message={error} />
+      {settled && (
+        <>
+          <PageHeader title={`Teklifi düzenle — ${quote.quoteNumber}`} />
+          <div className="card">
+            <Empty>Sonuçlanmış teklif düzenlenemez.</Empty>
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+function QuoteForm({ quote }: { quote?: Quote }) {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const customers = useData(() => api.customers());
 
-  const [customerId, setCustomerId] = useState(params.get("customerId") ?? "");
-  const [title, setTitle] = useState("");
-  const [taxRate, setTaxRate] = useState(20);
+  const [customerId, setCustomerId] = useState(quote ? String(quote.customerId) : params.get("customerId") ?? "");
+  const [title, setTitle] = useState(quote?.title ?? "");
+  const [taxRate, setTaxRate] = useState(quote?.taxRate ?? 20);
   const [validUntil, setValidUntil] = useState<Date | null>(() => {
+    if (quote) return utcDayToLocal(quote.validUntil);
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     d.setDate(d.getDate() + 30);
     return d;
   });
-  const [items, setItems] = useState<QuoteItem[]>([emptyItem()]);
+  const [items, setItems] = useState<QuoteItem[]>(() =>
+    quote
+      ? quote.items.map(({ description, quantity, unitPrice, discountPercent }) => ({ description, quantity, unitPrice, discountPercent }))
+      : [emptyItem()]
+  );
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -33,24 +71,31 @@ export default function QuoteFormPage() {
   const subTotal = items.reduce((s, i) => s + lineTotal(i), 0);
   const tax = subTotal * (taxRate / 100);
 
+  // Süresi geçmiş teklif düzenlenirken mevcut tarih seçilebilir kalsın
+  const today = new Date();
+  const original = quote && utcDayToLocal(quote.validUntil);
+  const minDate = original && original < today ? original : today;
+
   const updateItem = (index: number, patch: Partial<QuoteItem>) =>
     setItems(items.map((it, i) => (i === index ? { ...it, ...patch } : it)));
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
+    const data = {
+      title,
+      taxRate,
+      // Seçilen günün UTC gece yarısı (önceki <input type="date"> ile aynı); boşsa sunucu varsayılanı/mevcut tarihi kullanır
+      validUntil: validUntil
+        ? new Date(Date.UTC(validUntil.getFullYear(), validUntil.getMonth(), validUntil.getDate())).toISOString()
+        : undefined,
+      items: items.filter((i) => i.description.trim()),
+    };
     try {
-      const created = await api.createQuote({
-        customerId: Number(customerId),
-        title,
-        taxRate,
-        // Seçilen günün UTC gece yarısı (önceki <input type="date"> ile aynı); boşsa sunucu varsayılanı kullanır
-        validUntil: validUntil
-          ? new Date(Date.UTC(validUntil.getFullYear(), validUntil.getMonth(), validUntil.getDate())).toISOString()
-          : undefined,
-        items: items.filter((i) => i.description.trim()),
-      });
-      navigate(`/quotes/${created.id}`);
+      const saved = quote
+        ? await api.updateQuote(quote.id, data)
+        : await api.createQuote({ ...data, customerId: Number(customerId) });
+      navigate(`/quotes/${saved.id}`);
     } catch (err) {
       setError((err as Error).message);
       setSaving(false);
@@ -59,15 +104,19 @@ export default function QuoteFormPage() {
 
   return (
     <>
-      <Link to="/quotes" className="back-link"><ArrowLeft size={16} /> Teklifler</Link>
-      <PageHeader title="Yeni fiyat teklifi" />
+      {quote ? (
+        <Link to={`/quotes/${quote.id}`} className="back-link"><ArrowLeft size={16} /> {quote.quoteNumber}</Link>
+      ) : (
+        <Link to="/quotes" className="back-link"><ArrowLeft size={16} /> Teklifler</Link>
+      )}
+      <PageHeader title={quote ? `Teklifi düzenle — ${quote.quoteNumber}` : "Yeni fiyat teklifi"} />
 
       <form className="card form" onSubmit={submit}>
         <ErrorNote message={error} />
         <div className="form-row">
           <label>
             Müşteri *
-            <select required value={customerId} onChange={(e) => setCustomerId(e.target.value)}>
+            <select required disabled={!!quote} value={customerId} onChange={(e) => setCustomerId(e.target.value)}>
               <option value="">Seçin…</option>
               {customers.data?.map((c) => (
                 <option key={c.id} value={c.id}>{c.companyName}</option>
@@ -127,7 +176,7 @@ export default function QuoteFormPage() {
             </label>
             <label>
               Geçerlilik tarihi
-              <DateField value={validUntil} onChange={setValidUntil} minDate={new Date()} />
+              <DateField value={validUntil} onChange={setValidUntil} minDate={minDate} />
             </label>
           </div>
           <div className="totals">
@@ -139,7 +188,7 @@ export default function QuoteFormPage() {
 
         <div className="form-actions">
           <button type="button" className="btn ghost" onClick={() => navigate(-1)}>Vazgeç</button>
-          <button type="submit" className="btn primary" disabled={saving}>{saving ? "Kaydediliyor…" : "Teklifi oluştur"}</button>
+          <button type="submit" className="btn primary" disabled={saving}>{saving ? "Kaydediliyor…" : quote ? "Değişiklikleri kaydet" : "Teklifi oluştur"}</button>
         </div>
       </form>
     </>

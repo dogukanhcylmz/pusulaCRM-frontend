@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Printer, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Printer, Trash2 } from "lucide-react";
 import { api, type QuoteStatus } from "../api";
 import { formatDate, formatMoney, quoteStatusLabel, useData } from "../utils";
 import { ErrorNote, PageHeader } from "../components/ui";
@@ -40,6 +40,9 @@ export default function QuoteDetailPage() {
                     <option key={s} value={s}>{quoteStatusLabel[s]}</option>
                   ))}
                 </select>
+                {(q.status === "Draft" || q.status === "Sent") && (
+                  <Link to={`/quotes/${id}/edit`} className="btn ghost no-print"><Pencil size={15} /> Düzenle</Link>
+                )}
                 <button className="btn ghost" onClick={() => window.print()}><Printer size={15} /> Yazdır / PDF</button>
                 <button className="btn ghost danger" onClick={remove}><Trash2 size={15} /></button>
               </div>

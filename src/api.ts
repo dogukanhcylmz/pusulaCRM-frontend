@@ -67,6 +67,7 @@ export interface QuoteInput {
   validUntil?: string;
   items: QuoteItem[];
 }
+export type QuoteUpdateInput = Omit<QuoteInput, "customerId">;
 
 export interface Dashboard {
   customerCount: number;
@@ -164,6 +165,8 @@ export const api = {
   quote: (id: number) => request<Quote>(`/api/quotes/${id}`),
   createQuote: (data: QuoteInput) =>
     request<Quote>("/api/quotes", { method: "POST", body: JSON.stringify(data) }),
+  updateQuote: (id: number, data: QuoteUpdateInput) =>
+    request<Quote>(`/api/quotes/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   setQuoteStatus: (id: number, status: QuoteStatus) =>
     request<Quote>(`/api/quotes/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
   deleteQuote: (id: number) => request<void>(`/api/quotes/${id}`, { method: "DELETE" }),
