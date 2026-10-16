@@ -1,5 +1,6 @@
+import { lazy, Suspense } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
-import { FileText, LayoutDashboard, Users } from "lucide-react";
+import { BarChart3, FileText, LayoutDashboard, Users } from "lucide-react";
 import { api } from "./api";
 import { useData } from "./utils";
 import DashboardPage from "./pages/DashboardPage";
@@ -10,10 +11,13 @@ import QuoteFormPage from "./pages/QuoteFormPage";
 import QuoteDetailPage from "./pages/QuoteDetailPage";
 import ChatWidget from "./components/ChatWidget";
 
+const ReportsPage = lazy(() => import("./pages/ReportsPage"));
+
 const nav = [
   { to: "/", label: "Genel Bakış", icon: LayoutDashboard, end: true },
   { to: "/customers", label: "Müşteriler", icon: Users },
   { to: "/quotes", label: "Teklifler", icon: FileText },
+  { to: "/reports", label: "Raporlar", icon: BarChart3 },
 ];
 
 export default function App() {
@@ -62,6 +66,7 @@ export default function App() {
           <Route path="/quotes/new" element={<QuoteFormPage />} />
           <Route path="/quotes/:id" element={<QuoteDetailPage />} />
           <Route path="/quotes/:id/edit" element={<QuoteFormPage />} />
+          <Route path="/reports" element={<Suspense><ReportsPage /></Suspense>} />
         </Routes>
       </main>
 
