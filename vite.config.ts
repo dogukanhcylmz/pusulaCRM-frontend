@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// /api isteklerini C# backend'e yönlendirir (CORS gerekmez)
 export default defineConfig({
   plugins: [react()],
   server: {

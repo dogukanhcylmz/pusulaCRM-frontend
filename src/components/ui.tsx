@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
   useEffect(() => {
-    // Açık bir takvim Esc'i kendisi işlerse (defaultPrevented) modal kapanmaz
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && !e.defaultPrevented && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

@@ -1,0 +1,189 @@
+.toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.search {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 380px;
+}
+.search svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+}
+.search input {
+  padding-left: 34px;
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  background: var(--tabs-bg);
+  padding: 4px;
+  border-radius: 10px;
+  width: fit-content;
+  flex-wrap: wrap;
+}
+.tabs button {
+  border: none;
+  background: transparent;
+  padding: 7px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--muted);
+}
+.tabs button.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  padding: 12px 18px;
+  background: var(--surface-sunken);
+  border-bottom: 1px solid var(--border);
+}
+.table td {
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.table tr:last-child td {
+  border-bottom: none;
+}
+.table th.num {
+  text-align: right;
+}
+.table tr.clickable {
+  cursor: pointer;
+}
+.table tr.clickable:hover td {
+  background: var(--row-hover);
+}
+
+.card.is-loading {
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+.list-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.pagination .page-num {
+  min-width: 34px;
+  justify-content: center;
+}
+.pagination .page-num.active {
+  background: var(--primary-soft);
+  border-color: var(--primary-border);
+  color: var(--primary);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.list li:last-child {
+  border-bottom: none;
+}
+.list li > a {
+  color: inherit;
+}
+.list li.done .strong {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.check {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+.check input {
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+.note {
+  margin-top: 6px;
+  background: var(--surface-alt);
+  padding: 6px 9px;
+  border-radius: 7px;
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+.notes {
+  margin-top: 20px;
+}
+.notes .note {
+  margin-bottom: 6px;
+}
+
+@media (max-width: 760px) {
+  .toolbar > select {
+    flex: 1;
+  }
+  .search {
+    max-width: none;
+    min-width: 0;
+    flex-basis: 100%;
+  }
+  /* Sekmeler sarmak yerine yana kayar, sığmayan tablo kendi içinde kayar */
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+    scrollbar-width: none;
+  }
+  .tabs button {
+    white-space: nowrap;
+  }
+  .card.no-pad {
+    overflow-x: auto;
+  }
+  .table th,
+  .table td {
+    padding: 11px 12px;
+  }
+  .table td.num {
+    white-space: nowrap;
+  }
+}

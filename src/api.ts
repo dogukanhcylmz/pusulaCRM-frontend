@@ -1,10 +1,9 @@
-// Backend ile konuşan tek yer. Tipler C# DTO'larıyla birebir aynıdır.
 
 export type CustomerStatus = "Lead" | "Active" | "Passive";
 export type ActivityType = "Call" | "Meeting" | "Email" | "Task" | "Note";
 export type QuoteStatus = "Draft" | "Sent" | "Accepted" | "Rejected";
 
-export interface Customer {
+export interface Customer {   //back le tek bağlantı noktası
   id: number;
   companyName: string;
   contactName?: string;
@@ -16,7 +15,6 @@ export interface Customer {
   openActivityCount: number;
   quoteCount: number;
 }
-/** Sayfalı liste cevabı (backend `PagedResult<T>`). */
 export interface PagedResult<T> {
   items: T[];
   page: number;
@@ -100,7 +98,6 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
-/** Kullanıcının bulunduğu sayfa; asistan "bu müşteri" gibi ifadeleri buna göre anlar. */
 export interface ChatPageContext {
   page: string;
   customerId?: number;
@@ -139,11 +136,10 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
     let message = `İstek başarısız (${res.status})`;
     try {
       const body = await res.json();
-      // ASP.NET doğrulama hataları "errors" alanında gelir
+      // ASP.NET doğrulama hataları "errors" alanından gelcek 
       if (body.errors) message = Object.values(body.errors).flat().join(" ");
       else if (body.title) message = body.title;
     } catch {
-      /* gövde JSON değil */
     }
     throw new Error(message);
   }

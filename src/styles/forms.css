@@ -1,0 +1,141 @@
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  outline: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+select {
+  width: auto;
+  cursor: pointer;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 13px;
+}
+.form label select {
+  width: 100%;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.form-row.narrow {
+  max-width: 380px;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.date-field {
+  width: 100%;
+}
+.date-field input,
+.date-tap {
+  width: 100%;
+  padding: 9px 30px 9px 34px;
+}
+.date-field .react-datepicker__calendar-icon {
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+}
+.date-tap {
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  min-height: 40px;
+  cursor: pointer;
+}
+.date-tap.empty {
+  color: var(--muted);
+}
+.date-field .react-datepicker__close-icon {
+  padding-right: 10px;
+}
+.date-field .react-datepicker__close-icon::after {
+  background: var(--disabled);
+}
+
+.date-calendar.react-datepicker {
+  font-family: inherit;
+  color: var(--text);
+  border-color: var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+}
+.date-calendar .react-datepicker__header {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.date-calendar .react-datepicker__current-month {
+  text-transform: capitalize;
+}
+.date-calendar .react-datepicker__day {
+  border-radius: 8px;
+}
+.date-calendar .react-datepicker__day:hover,
+.date-calendar .react-datepicker__day--keyboard-selected {
+  background: var(--primary-soft);
+}
+.date-calendar .react-datepicker__day.react-datepicker__day--selected {
+  background: var(--primary);
+  color: #fff;
+}
+/* Kütüphanenin saat listesi seçicileri çok özgül; ancak !important ile ezilebiliyor */
+.date-calendar .react-datepicker__time-list-item:hover {
+  background: var(--primary-soft) !important;
+}
+.date-calendar .react-datepicker__time-list-item--selected {
+  background: var(--primary) !important;
+}
+.date-calendar .react-datepicker__day--today {
+  color: var(--primary);
+}
+#date-picker-root {
+  position: relative;
+  z-index: 60;
+}
+
+@media (max-width: 760px) {
+  /* iOS 16px altındaki alanlara odaklanınca sayfayı yakınlaştırır */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  .form-actions {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

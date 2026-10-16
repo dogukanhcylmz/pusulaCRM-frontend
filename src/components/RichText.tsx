@@ -1,10 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 
-/**
- * Asistan cevaplarındaki basit Markdown'ı güvenli şekilde gösterir:
- * **kalın**, madde işaretli (- veya •) ve numaralı listeler, paragraflar.
- * HTML olarak eklenmez (innerHTML yok), bu yüzden XSS riski taşımaz.
- */
+//Asistan cevaplarındaki basit Markdown'ı güvenli şekilde gösterir:
+
 export default function RichText({ text }: { text: string }) {
   const blocks: ReactNode[] = [];
   let list: { ordered: boolean; items: string[] } | null = null;

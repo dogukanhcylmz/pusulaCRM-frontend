@@ -38,10 +38,7 @@ const CUSTOMER_SUGGESTIONS = [
   "Bu müşteri için yarın 10:00'da arama görevi ekle",
 ];
 
-/**
- * Sağ alt köşedeki yüzen buton. Tıklanınca sohbet penceresi açılır; büyüt düğmesiyle genişler.
- * Asistan bir kayıt değişikliği önerdiğinde onay kartı gösterilir; kullanıcı onaylamadan hiçbir şey yazılmaz.
- */
+
 export default function ChatWidget() {
   const page = useCurrentChatPage();
   const [open, setOpen] = useState(false);
@@ -64,7 +61,6 @@ export default function ChatWidget() {
     if (open) inputRef.current?.focus();
   }, [open]);
 
-  /** Modele gönderilecek sohbet geçmişi: onay kartları ve sonuçları da metin olarak eklenir. */
   function toHistory(list: UiMessage[]): ChatMessage[] {
     return list
       .filter((m) => m.kind !== "welcome" && m.kind !== "error")
@@ -82,7 +78,7 @@ export default function ChatWidget() {
     const content = text.trim();
     if (!content || loading) return;
 
-    // Cevaplanmamış onay kartı varsa geçersiz say (sunucuda da iptal et)
+    // Cevaplanmamış onay kartı varsa geçersiz
     const expired = messages.map((m) => {
       if (m.kind === "pending" && m.state === "waiting") {
         api.cancelAction(m.pending!.id).catch(() => undefined);

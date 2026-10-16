@@ -33,7 +33,6 @@ export default function CustomersPage() {
     [page, debounced, status]
   );
 
-  // Silme sonrası sayfada kayıt kalmadıysa önceki sayfaya geç
   useEffect(() => {
     if (data && data.items.length === 0 && page > 1) setPage(page - 1);
   }, [data]);

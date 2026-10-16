@@ -1,0 +1,21 @@
+@media print {
+  .no-print,
+  .sidebar,
+  .chat-fab,
+  .chat-panel {
+    display: none !important;
+  }
+  body,
+  :root {
+    background: #fff;
+  }
+  .content {
+    padding: 0;
+    max-width: none;
+  }
+  .card {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+}

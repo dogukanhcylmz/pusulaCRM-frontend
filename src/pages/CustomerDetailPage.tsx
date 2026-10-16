@@ -20,8 +20,7 @@ export default function CustomerDetailPage() {
   const quotes = useData(() => api.quotes(id), [id]);
   const c = customer.data;
 
-  // Notlar bilgi kaydıdır (backend tamamlanmış sayar); aktiviteler yapılacak işler
-  const tasks = activities.data?.filter((a) => a.type !== "Note");
+  const tasks = activities.data?.filter((a) => a.type !== "Note"); //not bilgi kaydı oldu sadece
   const notes = activities.data
     ?.filter((a) => a.type === "Note")
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));

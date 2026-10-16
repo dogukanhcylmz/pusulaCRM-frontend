@@ -67,11 +67,10 @@ function QuoteForm({ quote }: { quote?: Quote }) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Toplamlar anlık hesaplanır; kesin hesap backend'de tekrar yapılır
   const subTotal = items.reduce((s, i) => s + lineTotal(i), 0);
   const tax = subTotal * (taxRate / 100);
 
-  // Süresi geçmiş teklif düzenlenirken mevcut tarih seçilebilir kalsın
+  //mevcut tarih seçilebilir kalsın
   const today = new Date();
   const original = quote && utcDayToLocal(quote.validUntil);
   const minDate = original && original < today ? original : today;

@@ -28,7 +28,6 @@ export default function CustomerForm({ initial, onSubmit, onCancel }: Props) {
     e.preventDefault();
     setSaving(true);
     try {
-      // Boş metinleri null olarak gönder (e-posta doğrulaması boş metinde hata vermesin)
       const clean = Object.fromEntries(Object.entries(form).map(([k, v]) => [k, v === "" ? undefined : v])) as CustomerInput;
       await onSubmit(clean);
     } catch (err) {

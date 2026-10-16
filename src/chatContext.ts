@@ -1,9 +1,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import type { ChatPageContext } from "./api";
 
-// Kullanıcının hangi sayfada olduğunu tutan küçük bir depo.
-// Sayfalar useChatPage ile kendini bildirir, asistan useCurrentChatPage ile okur.
-// Not: label yalnızca ekranda gösterilir; sunucu kayıt adını id üzerinden kendisi bulur.
+// Kullanıcının hangi sayfada olduğunu tutuyo 
 
 export type PageState = ChatPageContext & { label?: string };
 
@@ -15,7 +13,7 @@ function set(next: PageState) {
   listeners.forEach((l) => l());
 }
 
-/** Sayfa bileşenleri çağırır: "Şu an bu sayfadayım." */
+/** Şu an bu sayfadayın */
 export function useChatPage(page: string, ids: { customerId?: number; quoteId?: number; label?: string } = {}) {
   const { customerId, quoteId, label } = ids;
   useEffect(() => {
@@ -23,7 +21,6 @@ export function useChatPage(page: string, ids: { customerId?: number; quoteId?: 
   }, [page, customerId, quoteId, label]);
 }
 
-/** Asistan bileşeni çağırır. */
 export function useCurrentChatPage() {
   return useSyncExternalStore(
     (l) => {
