@@ -63,11 +63,11 @@ export default function ReportsPage() {
       <ErrorNote message={customers.error ?? quotes.error ?? activities.error} />
 
       <div className="grid-2">
-        <ChartCard title="Müşteriler duruma göre" data={byCustomerStatus} pie />
-        <ChartCard title="Teklif tutarı duruma göre" data={byQuoteStatus} money />
+        <ChartCard title="Müşteriler" data={byCustomerStatus} pie />
+        <ChartCard title="Teklif tutarları" data={byQuoteStatus} money />
         <ChartCard title="Aylık teklif tutarı (son 6 ay)" data={byMonth} money />
         <ChartCard title="En yüksek teklif tutarlı müşteriler" data={topCustomers} money horizontal />
-        <ChartCard title="Aktiviteler türe göre" data={byActivityType} pie />
+        <ChartCard title="Aktiviteler" data={byActivityType} pie />
       </div>
     </>
   );
