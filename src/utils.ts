@@ -13,7 +13,6 @@ export const formatDateTime = (iso?: string) =>
     ? new Date(iso).toLocaleString("tr-TR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })
     : "Tarihsiz";
 
-// ---------- Türkçe etiketler ----------
 export const customerStatusLabel: Record<CustomerStatus, string> = {
   Lead: "Potansiyel",
   Active: "Aktif",
@@ -33,19 +32,17 @@ export const quoteStatusLabel: Record<QuoteStatus, string> = {
   Rejected: "Reddedildi",
 };
 
-// ---------- Chatbot bir kayıt değiştirince sayfaları yenilemek için ----------
+// Chatbot bir kayıt değiştirince sayfaları yenilemek için --- useDATA LAR DİNLİYOR
+// chatle bir aktivite eklediğimde açık müşteri sayfası güncelleneck
 const EVENT = "crm:changed";
 export const notifyDataChanged = () => window.dispatchEvent(new Event(EVENT));
 
-/** Veriyi yükler; chatbot bir değişiklik yaptığında otomatik yeniden yükler. */
 export function useData<T>(loader: () => Promise<T>, deps: unknown[] = []) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  // Yalnızca en son isteğin cevabı işlenir; geç gelen eski cevap yenisini ezmez
   const lastRequest = useRef(0);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const load = useCallback(loader, deps);
 
   const reload = useCallback(() => {

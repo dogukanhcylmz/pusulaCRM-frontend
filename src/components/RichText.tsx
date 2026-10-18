@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 
-//Asistan cevaplarındaki basit Markdown'ı güvenli şekilde gösterir:
+//Asistan cevaplarındaki basit Markdown'ı güvenli şekilde gösterir
 
 export default function RichText({ text }: { text: string }) {
   const blocks: ReactNode[] = [];
