@@ -10,6 +10,4 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Yerel Claude notları (repoya girmez)
-CLAUDE.md
 docs/
