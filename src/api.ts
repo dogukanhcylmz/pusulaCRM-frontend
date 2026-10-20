@@ -150,6 +150,25 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   return res.status === 204 ? (undefined as T) : res.json();
 }
 
+// Dosyayı indirir; adı sunucunun verdiği Content-Disposition'dan alır (Türkçe karakterli ad filename* ile gelir)
+async function downloadFile(url: string, fallbackName: string) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(res.status === 404 ? "Kayıt bulunamadı." : `İndirme başarısız (${res.status})`);
+
+  const disposition = res.headers.get("Content-Disposition") ?? "";
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(disposition)?.[1];
+  const name = encoded ? decodeURIComponent(encoded) : fallbackName;
+
+  const href = URL.createObjectURL(await res.blob());
+  const a = document.createElement("a");
+  a.href = href;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(href), 1000);
+}
+
 const qs = (params: Record<string, string | number | boolean | undefined>) => {
   const p = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => v !== undefined && v !== "" && p.set(k, String(v)));
@@ -190,6 +209,7 @@ export const api = {
   setQuoteStatus: (id: number, status: QuoteStatus) =>
     request<Quote>(`/api/quotes/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
   deleteQuote: (id: number) => request<void>(`/api/quotes/${id}`, { method: "DELETE" }),
+  downloadQuotePdf: (id: number, fallbackName: string) => downloadFile(`/api/quotes/${id}/pdf`, fallbackName),
 
   me: () => request<CurrentUser>("/api/me"),
 

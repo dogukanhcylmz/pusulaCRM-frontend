@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Pencil, Printer, Trash2 } from "lucide-react";
+import { ArrowLeft, FileDown, Pencil, Trash2 } from "lucide-react";
 import { api, type QuoteStatus } from "../api";
 import { formatDate, formatMoney, quoteStatusLabel, useData } from "../utils";
 import { ErrorNote, PageHeader } from "../components/ui";
@@ -10,11 +11,26 @@ export default function QuoteDetailPage() {
   const id = Number(useParams().id);
   const navigate = useNavigate();
   const { data: q, error, reload } = useData(() => api.quote(id), [id]);
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
   useChatPage("quote-detail", { quoteId: id, label: q ? `${q.quoteNumber} · ${q.customerName}` : undefined });
 
   async function setStatus(status: QuoteStatus) {
     await api.setQuoteStatus(id, status);
     reload();
+  }
+
+  async function downloadPdf() {
+    if (!q) return;
+    setPdfBusy(true);
+    setPdfError(null);
+    try {
+      await api.downloadQuotePdf(id, `${q.quoteNumber}.pdf`);
+    } catch (e) {
+      setPdfError(`PDF indirilemedi: ${(e as Error).message}`);
+    } finally {
+      setPdfBusy(false);
+    }
   }
 
   async function remove() {
@@ -27,6 +43,7 @@ export default function QuoteDetailPage() {
     <>
       <Link to="/quotes" className="back-link no-print"><ArrowLeft size={16} /> Teklifler</Link>
       <ErrorNote message={error} />
+      <ErrorNote message={pdfError} />
 
       {q && (
         <>
@@ -43,7 +60,9 @@ export default function QuoteDetailPage() {
                 {(q.status === "Draft" || q.status === "Sent") && (
                   <Link to={`/quotes/${id}/edit`} className="btn ghost no-print"><Pencil size={15} /> Düzenle</Link>
                 )}
-                <button className="btn ghost" onClick={() => window.print()}><Printer size={15} /> Yazdır / PDF</button>
+                <button className="btn ghost" onClick={downloadPdf} disabled={pdfBusy}>
+                  <FileDown size={15} /> {pdfBusy ? "Hazırlanıyor…" : "PDF indir"}
+                </button>
                 <button className="btn ghost danger" onClick={remove}><Trash2 size={15} /></button>
               </div>
             }
