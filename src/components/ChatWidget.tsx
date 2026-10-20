@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
-  AlertTriangle, Bot, CheckCircle2, Maximize2, MessageCircle, Minimize2, Send, ShieldCheck, Sparkles, Trash2, X, XCircle,
+  AlertTriangle, Bot, CheckCircle2, Maximize2, MessageCircle, Mic, MicOff, Minimize2, Send, ShieldCheck, Sparkles, Trash2, X, XCircle,
 } from "lucide-react";
 import { api, type ChatMessage, type PendingAction } from "../api";
 import { notifyDataChanged } from "../utils";
 import { useCurrentChatPage } from "../chatContext";
+import { useSpeechRecognition } from "../hooks/useSpeechRecognition";
 import RichText from "./RichText";
 
 type PendingState = "waiting" | "busy" | "confirmed" | "cancelled" | "expired";
@@ -49,6 +50,22 @@ export default function ChatWidget() {
   const [aiEnabled, setAiEnabled] = useState<boolean | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const dictationBase = useRef(""); // dinleme başlarken kutuda olan metin; söylenenler sonna eklenir
+
+  const speech = useSpeechRecognition({
+    onText: (text) => setInput([dictationBase.current, text].filter(Boolean).join(" ")),
+    onError: (message) => setMessages((m) => [...m, { role: "assistant", kind: "error", content: message }]),
+  });
+
+  function toggleMic() {
+    if (speech.listening) {
+      speech.stop();
+      return;
+    }
+    dictationBase.current = input.trim();
+    speech.start();
+    inputRef.current?.focus();
+  }
 
   const onCustomerPage = page.customerId !== undefined;
   const suggestions = onCustomerPage ? CUSTOMER_SUGGESTIONS : GENERAL_SUGGESTIONS;
@@ -59,7 +76,8 @@ export default function ChatWidget() {
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
-  }, [open]);
+    else speech.cancel();
+  }, [open, speech.cancel]);
 
   function toHistory(list: UiMessage[]): ChatMessage[] {
     return list
@@ -77,8 +95,8 @@ export default function ChatWidget() {
   async function send(text: string) {
     const content = text.trim();
     if (!content || loading) return;
+    speech.cancel(); // geç gelen ses  yazılmasın
 
-    // Cevaplanmamış onay kartı varsa geçersiz
     const expired = messages.map((m) => {
       if (m.kind === "pending" && m.state === "waiting") {
         api.cancelAction(m.pending!.id).catch(() => undefined);
@@ -200,8 +218,9 @@ export default function ChatWidget() {
               ref={inputRef}
               rows={1}
               maxLength={2000}
-              placeholder="Bir şey sorun veya isteyin…"
+              placeholder={speech.listening ? "Dinleniyor… konuşabilirsinz" : "Bir şey sorun veya isteyin…"}
               value={input}
+              readOnly={speech.listening}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -210,6 +229,19 @@ export default function ChatWidget() {
                 }
               }}
             />
+            {speech.supported && (
+              <button
+                type="button"
+                className={`mic-btn ${speech.listening ? "listening" : ""}`}
+                onClick={toggleMic}
+                disabled={loading && !speech.listening}
+                aria-pressed={speech.listening}
+                aria-label={speech.listening ? "Dinlemeyi durdur" : "Sesle yaz"}
+                title={speech.listening ? "Dinlemeyi durdur" : "Sesle yaz"}
+              >
+                {speech.listening ? <MicOff size={16} /> : <Mic size={16} />}
+              </button>
+            )}
             <button type="submit" className="send-btn" disabled={loading || !input.trim()} aria-label="Gönder">
               <Send size={16} />
             </button>
