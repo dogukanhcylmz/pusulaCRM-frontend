@@ -33,7 +33,7 @@ const Ctor: RecognitionCtor | undefined =
       (window as unknown as { webkitSpeechRecognition?: RecognitionCtor }).webkitSpeechRecognition;
 
 const SILENCE_MS = 4000; // bu kadar konuşulmazsa dinleme kendiliğinden biter
-
+const STOP_GRACE_MS = 1500; // durdurduktan sonra son sonucu 1.5 sn bekkl
 const ERRORS: Record<string, string> = {
   "not-allowed": "Mikrofn izni verilmedi. Tarayıcının adres çubuğundan mikrofon iznini açabilirsiniz.",
   "service-not-allowed": "Bu tarayıcıda ses tanıma kullanılamıyor.",
@@ -44,7 +44,6 @@ const ERRORS: Record<string, string> = {
 
 interface Options {
   lang?: string;
-  /** Bu dinleme oturumunda o ana kadar söylenen metin (kesinleşen + ara sonuç). */
   onText: (text: string) => void;
   onError: (message: string) => void;
 }
@@ -56,24 +55,43 @@ export function useSpeechRecognition({ lang = "tr-TR", onText, onError }: Option
   const handlers = useRef({ onText, onError });
   handlers.current = { onText, onError };
 
+  const graceRef = useRef<number>();
+  const stoppingRef = useRef<Recognition | null>(null); // durdurulmuş, son sonucu beklenen oturum
+
   const clearSilence = () => window.clearTimeout(silenceRef.current);
 
-  const stop = useCallback(() => {  // o ana kadar geönderilecek
+  const detach = useCallback(() => {
     clearSilence();
-    recRef.current?.stop();
-  }, []);
-
-  const cancel = useCallback(() => {
-    clearSilence();
+    window.clearTimeout(graceRef.current);
     const rec = recRef.current;
+    recRef.current = null;
+    setListening(false);
     if (!rec) return;
     rec.onresult = null;
     rec.onerror = null;
+    rec.onend = null;
     rec.abort();
   }, []);
 
+  const stop = useCallback(() => {  // o ana kadar geönderilecek
+    clearSilence();
+    const rec = recRef.current;
+    if (!rec) return;
+    setListening(false); // tarayıcının bitişi bildirmesini bekleiyo
+    rec.onerror = null;  // kullanıcı durdurdu
+    stoppingRef.current = rec;
+    rec.stop();         
+    window.clearTimeout(graceRef.current);
+    graceRef.current = window.setTimeout(() => {
+      if (recRef.current === rec) detach();
+    }, STOP_GRACE_MS);
+  }, [detach]);
+
+  const cancel = detach;
+
   const start = useCallback(() => {
-    if (!Ctor || recRef.current) return;
+    if (!Ctor) return;
+    if (recRef.current) detach(); 
 
     const rec = new Ctor();
     rec.lang = lang;
@@ -83,7 +101,9 @@ export function useSpeechRecognition({ lang = "tr-TR", onText, onError }: Option
     let finalText = "";
     const armSilence = () => {
       clearSilence();
-      silenceRef.current = window.setTimeout(() => rec.stop(), SILENCE_MS);
+      silenceRef.current = window.setTimeout(() => {
+        if (recRef.current === rec) stop();
+      }, SILENCE_MS);
     };
 
     rec.onresult = (e) => {
@@ -94,14 +114,16 @@ export function useSpeechRecognition({ lang = "tr-TR", onText, onError }: Option
         else interim += r[0].transcript;
       }
       handlers.current.onText((finalText + interim).replace(/\s+/g, " ").trim());
-      armSilence();
+      if (recRef.current === rec && stoppingRef.current !== rec) armSilence();
     };
     rec.onerror = (e) => {
       if (e.error === "aborted") return;
       handlers.current.onError(ERRORS[e.error] ?? `Ses tanıma hatası: ${e.error}`);
     };
     rec.onend = () => {
+      if (recRef.current !== rec) return; // eski oturumun geç bitişi yenisini kapatmasın
       clearSilence();
+      window.clearTimeout(graceRef.current);
       recRef.current = null;
       setListening(false);
     };
@@ -115,7 +137,7 @@ export function useSpeechRecognition({ lang = "tr-TR", onText, onError }: Option
       recRef.current = null;
       handlers.current.onError("Ses tanıma başlatılamadı.");
     }
-  }, [lang]);
+  }, [lang, detach, stop]);
 
   useEffect(() => cancel, [cancel]);
 
