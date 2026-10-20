@@ -7,8 +7,12 @@ export interface Customer {   //back le tek bağlantı noktası
   id: number;
   companyName: string;
   contactName?: string;
+  contactTitle?: string;
   email?: string;
   phone?: string;
+  landline?: string;
+  website?: string;
+  address?: string;
   city?: string;
   status: CustomerStatus;
   createdAt: string;

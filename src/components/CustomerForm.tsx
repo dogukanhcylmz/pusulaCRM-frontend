@@ -13,16 +13,21 @@ export default function CustomerForm({ initial, onSubmit, onCancel }: Props) {
   const [form, setForm] = useState<CustomerInput>({
     companyName: initial?.companyName ?? "",
     contactName: initial?.contactName ?? "",
+    contactTitle: initial?.contactTitle ?? "",
     email: initial?.email ?? "",
     phone: initial?.phone ?? "",
+    landline: initial?.landline ?? "",
+    website: initial?.website ?? "",
+    address: initial?.address ?? "",
     city: initial?.city ?? "",
     status: initial?.status ?? "Lead",
   });
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const set = (k: keyof CustomerInput) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm({ ...form, [k]: e.target.value });
+  const set = (k: keyof CustomerInput) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+      setForm({ ...form, [k]: e.target.value });
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -49,6 +54,16 @@ export default function CustomerForm({ initial, onSubmit, onCancel }: Props) {
           <input value={form.contactName} onChange={set("contactName")} />
         </label>
         <label>
+          Yetkilinin unvanı
+          <input value={form.contactTitle} onChange={set("contactTitle")} placeholder="ör. Satın Alma Müdürü" />
+        </label>
+      </div>
+      <div className="form-row">
+        <label>
+          E-posta
+          <input type="email" value={form.email} onChange={set("email")} />
+        </label>
+        <label>
           Durum
           <select value={form.status} onChange={set("status")}>
             {(Object.keys(customerStatusLabel) as CustomerStatus[]).map((s) => (
@@ -59,17 +74,27 @@ export default function CustomerForm({ initial, onSubmit, onCancel }: Props) {
       </div>
       <div className="form-row">
         <label>
-          E-posta
-          <input type="email" value={form.email} onChange={set("email")} />
+          Telefon
+          <input type="tel" value={form.phone} onChange={set("phone")} />
         </label>
         <label>
-          Telefon
-          <input value={form.phone} onChange={set("phone")} />
+          Sabit telefon
+          <input type="tel" value={form.landline} onChange={set("landline")} />
+        </label>
+      </div>
+      <div className="form-row">
+        <label>
+          Web sitesi
+          <input value={form.website} onChange={set("website")} placeholder="ör. www.firma.com" />
+        </label>
+        <label>
+          Şehir
+          <input value={form.city} onChange={set("city")} />
         </label>
       </div>
       <label>
-        Şehir
-        <input value={form.city} onChange={set("city")} />
+        Açık adres
+        <textarea rows={2} value={form.address} onChange={set("address")} />
       </label>
       <div className="form-actions">
         <button type="button" className="btn ghost" onClick={onCancel}>Vazgeç</button>

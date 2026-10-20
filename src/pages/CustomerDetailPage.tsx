@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Mail, MapPin, Pencil, Phone, Plus, StickyNote, Trash2, User } from "lucide-react";
+import { ArrowLeft, Globe, Mail, MapPin, Pencil, Phone, Plus, StickyNote, Trash2, User } from "lucide-react";
 import { api, type Activity, type ActivityType } from "../api";
 import { activityTypeLabel, formatDate, formatDateTime, formatMoney, useData } from "../utils";
 import DateField from "../components/DateField";
@@ -66,10 +66,16 @@ export default function CustomerDetailPage() {
 
           <div className="info-bar card">
             <CustomerStatusBadge status={c.status} />
-            {c.contactName && <span><User size={15} /> {c.contactName}</span>}
+            {c.contactName && <span><User size={15} /> {c.contactName}{c.contactTitle && ` · ${c.contactTitle}`}</span>}
             {c.email && <a href={`mailto:${c.email}`}><Mail size={15} /> {c.email}</a>}
             {c.phone && <a href={`tel:${c.phone}`}><Phone size={15} /> {c.phone}</a>}
-            {c.city && <span><MapPin size={15} /> {c.city}</span>}
+            {c.landline && <a href={`tel:${c.landline}`} title="Sabit telefon"><Phone size={15} /> {c.landline} (sabit)</a>}
+            {c.website && (
+              <a href={/^https?:\/\//i.test(c.website) ? c.website : `https://${c.website}`} target="_blank" rel="noreferrer">
+                <Globe size={15} /> {c.website}
+              </a>
+            )}
+            {(c.address || c.city) && <span><MapPin size={15} /> {[c.address, c.city].filter(Boolean).join(", ")}</span>}
           </div>
 
           <div className="grid-2">
