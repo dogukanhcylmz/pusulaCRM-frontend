@@ -2,6 +2,8 @@
 
 Pusula CRM'in React ile yazılmış arayüzü. Müşterileri, aktiviteleri, notları ve fiyat tekliflerini buradan yönetiyoruz. Sağ altta da bir yapay zekâ asistanı var.
 
+🔗 **Canlı demo:** https://digitest-crm-frontend.vercel.app
+
 Backend ayrı bir repoda (ASP.NET Core 8). Bu proje tek başına çalışmıyor, arkada API'nin ayakta olması gerekiyor.
 
 ## Ekran görüntüleri
