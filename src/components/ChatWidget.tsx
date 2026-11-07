@@ -151,12 +151,12 @@ export default function ChatWidget() {
   return (
     <>
       {open && (
-        <section className={`chat-panel ${expanded ? "expanded" : ""}`} aria-label="digitestCRM asistanı">
+        <section className={`chat-panel ${expanded ? "expanded" : ""}`} aria-label="Pusula CRM asistanı">
           <header className="chat-header">
             <div className="chat-title">
               <div className="chat-avatar"><Sparkles size={16} /></div>
               <div>
-                <strong>digitestCRM Asistanı</strong>
+                <strong>Pusula CRM Asistanı</strong>
                 <span>{aiEnabled === false ? "Basit mod" : "Yapay zeka destekli"}</span>
               </div>
             </div>

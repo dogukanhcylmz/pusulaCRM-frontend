@@ -34,7 +34,7 @@ export default function App() {
       <aside className="sidebar no-print">
         <div className="brand">
           <span>
-            digitest<b>CRM</b>
+            pusula<b>CRM</b>
           </span>
         </div>
         <nav>

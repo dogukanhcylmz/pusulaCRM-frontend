@@ -1,8 +1,28 @@
-# digitestCRM — Web arayüzü
+# Pusula CRM — Web arayüzü
 
-digitestCRM'in React ile yazılmış arayüzü. Müşterileri, aktiviteleri, notları ve fiyat tekliflerini buradan yönetiyoruz. Sağ altta da bir yapay zekâ asistanı var.
+Pusula CRM'in React ile yazılmış arayüzü. Müşterileri, aktiviteleri, notları ve fiyat tekliflerini buradan yönetiyoruz. Sağ altta da bir yapay zekâ asistanı var.
 
 Backend ayrı bir repoda (ASP.NET Core 8). Bu proje tek başına çalışmıyor, arkada API'nin ayakta olması gerekiyor.
+
+## Ekran görüntüleri
+
+![Genel bakış](screenshots/dashboard.png)
+
+| Müşteriler | Müşteri kartı |
+|---|---|
+| ![Müşteriler](screenshots/customers.png) | ![Müşteri kartı](screenshots/customer-detail.png) |
+
+| Teklifler | Teklif detayı |
+|---|---|
+| ![Teklifler](screenshots/quotes.png) | ![Teklif detayı](screenshots/quote-detail.png) |
+
+| Yeni teklif | Raporlar |
+|---|---|
+| ![Yeni teklif](screenshots/quote-form.png) | ![Raporlar](screenshots/reports.png) |
+
+**Asistan**
+
+![Asistan](screenshots/assistant.png)
 
 ## Neler var
 
